@@ -1,14 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
 	#region ---Public Members---
 	[SerializeField] private Animator playerAnimator;
 
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float slideMinDistance;
+    [SerializeField, Range(0, 10), Tooltip("플레이어 캐릭터 이동 속도")] 
+    private float moveSpeed;
+    [SerializeField, Range(0, 50), Tooltip("슬라이드 터치 최소 인지 범위")] 
+    private float slideMinDistance;
+    [SerializeField, Range(0, 30), Tooltip("플레이어의 양 사이드 간 최소 이격 거리")]
+    private float sideDistance;
 	#endregion
 
 	#region ---Private Members---
@@ -77,15 +84,16 @@ public class Player : MonoBehaviour
         if(Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            switch(touch.phase)
-            {
+
+			switch (touch.phase)
+            { 
                 case TouchPhase.Began:
 					touchStartPosition = touch.position;
 					previousTouchPosition = touch.position;
                     isSliding = false;
 					break;
 
-                case TouchPhase.Moved:
+                case TouchPhase.Moved: 
                     if(!isSliding)
                     {
                         if(Vector2.Distance(touchStartPosition, touch.position) >= slideMinDistance)
@@ -123,8 +131,10 @@ public class Player : MonoBehaviour
 	private void PlayerMove(float deltaX)
     {
         float moveAmount = deltaX * moveSpeed * Time.deltaTime;
-        Vector3 newPos = transform.position + new Vector3(moveAmount, 0, 0);
-        newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
-        transform.position = newPos;
+        float newTarget = transform.position.x + moveAmount;
+        newTarget = Mathf.Clamp(newTarget, minX + sideDistance, maxX - sideDistance);
+
+        Vector3 targetPos = new Vector3(newTarget, transform.position.y, transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, targetPos, 0.5f);
 	}
 }
