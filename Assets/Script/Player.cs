@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -14,8 +15,9 @@ public class Player : MonoBehaviour
     private float moveSpeed;
     [SerializeField, Range(0, 50), Tooltip("슬라이드 터치 최소 인지 범위")] 
     private float slideMinDistance;
-    [SerializeField, Range(0, 30), Tooltip("플레이어의 양 사이드 간 최소 이격 거리")]
-    private float sideDistance;
+
+    [SerializeField, Tooltip("UI 입력 탐지를 위한 레이캐스터")] 
+    private GraphicRaycaster uiRayCaster;
 	#endregion
 
 	#region ---Private Members---
@@ -23,6 +25,9 @@ public class Player : MonoBehaviour
 	private Vector2 touchStartPosition;
     private Vector2 previousTouchPosition;
     private bool isSliding = false;
+
+    private PointerEventData pointerData;
+    private List<RaycastResult> raycastResults = new();
 
     /* Screen boundary variable */
     private float minX;
@@ -35,9 +40,17 @@ public class Player : MonoBehaviour
     {
 		CalcPlayerSizeAndScreen();
 
+        if(uiRayCaster == null)
+            uiRayCaster = FindObjectOfType<GraphicRaycaster>();
+        pointerData = new PointerEventData(EventSystem.current);
 	}
 
-    void Update()
+	void Start()
+	{
+		
+	}
+
+	void Update()
     {
         RunIdle();
         AutoAttack();
@@ -85,6 +98,8 @@ public class Player : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
 
+            if(IsTouchOverUI(touch)) return;
+
 			switch (touch.phase)
             { 
                 case TouchPhase.Began:
@@ -121,8 +136,6 @@ public class Player : MonoBehaviour
                 default: break;
             }
         }
-
-
 	}
 
 	/// <summary>
@@ -131,10 +144,20 @@ public class Player : MonoBehaviour
 	private void PlayerMove(float deltaX)
     {
         float moveAmount = deltaX * moveSpeed * Time.deltaTime;
-        float newTarget = transform.position.x + moveAmount;
-        newTarget = Mathf.Clamp(newTarget, minX + sideDistance, maxX - sideDistance);
+        Vector3 newPos = transform.position + new Vector3(moveAmount, 0, 0);
 
-        Vector3 targetPos = new Vector3(newTarget, transform.position.y, transform.position.z);
-        transform.position = Vector3.Lerp(transform.position, targetPos, 0.5f);
+        newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+        transform.position = newPos;
 	}
+
+    /// <summary>
+    /// Check is Users Touch Input is Over UI Object
+    /// </summary>
+    private bool IsTouchOverUI(Touch touch)
+    {
+        pointerData.position = touch.position;
+        raycastResults.Clear();
+        uiRayCaster.Raycast(pointerData, raycastResults);
+        return raycastResults.Count > 0;
+    }
 }
