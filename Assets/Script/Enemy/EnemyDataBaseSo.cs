@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class EnemyDataBaseSo : ScriptableObject
 {
-	public Sprite _sprite;
+	public GameObject _obj;
 }
 
 [CreateAssetMenu]

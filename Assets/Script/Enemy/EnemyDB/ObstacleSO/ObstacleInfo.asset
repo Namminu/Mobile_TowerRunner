@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: ObstacleInfo
+  m_EditorClassIdentifier: Assembly-CSharp::ObstacleInfos
+  entries:
+  - {fileID: 11400000, guid: ec5c65ab87d701f4f93e2dc0f9b2137b, type: 2}
+  - {fileID: 11400000, guid: 7a958d06d76486a4b91ced2abb8ebee5, type: 2}
+  - {fileID: 11400000, guid: bdccb6b7306471649b61cfb31aef45ab, type: 2}
+  - {fileID: 11400000, guid: c52fcb5ea7147564899353d73fdb48d8, type: 2}
